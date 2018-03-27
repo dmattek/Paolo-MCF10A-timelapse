@@ -15,18 +15,18 @@ params = list()
 # This directory is the root for all following directories
 # E.g. myexp1/cp.out1/output/out_0001
 params$s.dir.data = args[1]
-params$s.dir.data = '/Volumes/imaging.data/Paolo/MCF10A_TimeLapse/2018-03-26_MCF10Amutants_H2B-miRFP_ERKKTR-Turq_FoxO-NeonGreen_40xAir_T5min_Stim15min-1ngmlEGF_24h-starving+CO2/cp.out2/output/out_0001'
+#params$s.dir.data = '/Volumes/imaging.data/Paolo/MCF10A_TimeLapse/2018-03-26_MCF10Amutants_H2B-miRFP_ERKKTR-Turq_FoxO-NeonGreen_40xAir_T5min_Stim15min-1ngmlEGF_24h-starving+CO2/cp.out2/output/out_0001'
 
 # Core of the file name with CP output, e.g. objNuclei_1line
 params$s.file.core = args[2]
-params$s.file.core = 'objNuclei_1line'
+#params$s.file.core = 'objNuclei_1line'
 
 # Directory, relative to root, to LAP output, e.g. tracksXY_objNuclei_1line
 params$s.dir.tracks = args[3]
-params$s.dir.tracks = 'trackXY_objNuclei_1line'
+#params$s.dir.tracks = 'trackXY_objNuclei_1line'
 
 # minimum track length
-params$tracklen = as.integer(args[4])
+#params$tracklen = as.integer(args[4])
 params$tracklen = 10
 
 ## Create paths based on user input
