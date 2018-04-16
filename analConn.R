@@ -104,6 +104,7 @@ dt.concp.sub = dt.concp[get(params$s.trackuni) %in% v.longtrackid]
 setkeyv(dt.concp.sub, c(params$s.well, params$s.site, params$s.track))
 
 
+
 # save a reduced dataset with:
 # Image_Metadata_Well Image_Metadata_Site Image_Metadata_T
 # track_id - track ID from u-track (it's unique per analysis; if analysis with u-track was performed on the entire dataset, track_id is unique)
@@ -111,7 +112,10 @@ setkeyv(dt.concp.sub, c(params$s.well, params$s.site, params$s.track))
 # all measurements as in the full data set
 # ONLY CELLS with tracks longer than the threshold params$tracklen
 v.meascol = names(dt.concp.sub)[names(dt.concp.sub) %like% 'obj']
-write.csv(x = dt.concp.sub[, (c(params$s.well, params$s.site, params$s.time, params$s.track, params$s.pm.condall, v.meascol)), with = FALSE], 
+
+
+
+write.csv(x = dt.concp.sub[, (c(params$s.well, params$s.site, params$s.time, params$s.track, params$s.trackuni, params$s.pm.condall, v.meascol)), with = FALSE], 
           file = file.path(params$s.dir.data, paste0(params$s.file.core, params$s.file.track.suff)), 
           row.names = F, quote = F)
 
