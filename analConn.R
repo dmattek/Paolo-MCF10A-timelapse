@@ -49,7 +49,7 @@ params$s.well = 'Image_Metadata_Well'
 params$s.site = 'Image_Metadata_Site'
 params$s.time = 'Image_Metadata_T'
 params$s.objnum.con = 'ObjectNumber'
-params$s.objnum.cp = paste0(params$s.file.core, '_ObjectNumber')
+params$s.objnum.cp = 'objNuclei_ObjectNumber'
 params$s.track = 'track_id'
 params$s.trackuni = paste0(params$s.track, "_uni")
 
@@ -93,6 +93,7 @@ if (is.na(v.wells)) {
   b.well = 1
 }
 
+print("v.wells")
 print(v.wells)
 
 dt.wells = data.table(tmp1 = v.wells, 
@@ -100,26 +101,41 @@ dt.wells = data.table(tmp1 = v.wells,
 setnames(dt.wells, c(params$s.well, paste0(params$s.well, '_num')))
 
 # add a column with proper well names
+print('----------')
+print("dt.con")
 print(dt.con)
+
+print('----------')
+print("dt.wells")
 print(dt.wells)
+
 dt.con = merge(dt.con, dt.wells)
 
-print("merge 1")
+print('---------')
+print("merge 1 done")
 print(b.well)
+
 # merge connectivities with data
 # dt.con holds the output from MATLAB with object numbers that belong to individual tracks
 # Each of these object numbers is merged with data from CP output
+print("names(dt.con)")
 print(names(dt.con))
+
+print('---------')
+print("names(dt.cp)")
 print(names(dt.cp))
-if (b.well)
+
+if (b.well) {
+  cat(params$s.well, params$s.site, params$s.time, params$s.objnum.con, "\n")
+  cat(params$s.well, params$s.site, params$s.time, params$s.objnum.cp, "\n")
   dt.concp = merge(dt.con, dt.cp, 
       by.x = c(params$s.well, params$s.site, params$s.time, params$s.objnum.con), 
       by.y = c(params$s.well, params$s.site, params$s.time, params$s.objnum.cp), 
-      all.x = T) else
+      all.x = T) } else {
   dt.concp = merge(dt.con, dt.cp,
       by.x = c(params$s.site, params$s.time, params$s.objnum.con),
       by.y = c(params$s.site, params$s.time, params$s.objnum.cp),
-      all.x = T)
+      all.x = T) }
 
 if (b.well)
   setkeyv(dt.concp, c(params$s.well, params$s.site, params$s.track)) else
