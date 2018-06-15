@@ -13,6 +13,9 @@ s.f.in = args[1]
 # output file
 s.f.out = args[2]
 
+# config file
+s.f.cfg = args[3]
+
 # list of column names to remove
 s.cols.rm = c('Image_Metadata_C',
               'Image_Metadata_Channel',
@@ -30,9 +33,21 @@ s.cols.rm = c('Image_Metadata_C',
               'Image_Metadata_Series')
   
 require(tca)
+require(data.table)
+
+# read config file
+dt.cfg = fread('lapconfig.csv',select = 1:2)
+l.cfg=split(dt.cfg[[2]], dt.cfg[[1]])
+l.cfg=convertStringList2Types(l.cfg)
+
 # read a CSV with a 2-line header; 
 # remove repeated columns; 
 # remove columns according to the list in s.cols.rm
+
+# NEXT
+# 1. make a check whether list element "cleam_cols" exists
+# 2. make a check whether s.cols.rm isn't empty
+s.cols.rem = unlist(strsplit(l.cfg$clean_cols, ','))
 dt=freadCSV2lineHeader(s.f.in, s.cols.rm)
 
 # save file; no row numbers, no quotes around strings
