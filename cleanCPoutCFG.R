@@ -13,7 +13,7 @@ s.f.in = args[1]
 # output file
 s.f.out = args[2]
 
-# config file
+# config filename 
 s.f.cfg = args[3]
 
 # list of column names to remove
