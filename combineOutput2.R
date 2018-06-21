@@ -1,10 +1,19 @@
 # Searches for csv files in all sub-directories of a given directory, merges the files
 # and puts them in specified output directory.
-# FIles for merging should have a 1-line-header
+# Files for merging should have a 1-line-header
+#
+# Example call from the command-line
+# Rscript combineOutput2.R ~/myexp1/cp.out/output objNuc.csv .mer
+# Last parameter is optional, defaults to ".mer"
 
 require(data.table)
 
 args <- commandArgs(TRUE)
+
+if(sum(is.na(args[1:2])) > 0) {
+  stop('Insufficient input parameters. Call: Rscript combineOutput2.R CPoutput_dir CPoutput_file DirSuffix [optional; default .mer')
+}
+
 
 # params
 params = list()
@@ -14,17 +23,22 @@ params = list()
 # Path to CP output
 # This directory is the root for a directory that contains sub-directories
 # E.g. myexp1/cp.out1/output
-if (is.na(args[1]))
-  params$s.dir.data = '.' else
-    params$s.dir.data = args[1]
+params$s.dir.data = args[1]
 
-# Core of the file name with CP output, e.g. objNuclei_1line_clean_tracks.csv
-if (is.na(args[2]))
-  params$s.file.data = 'output.csv' else
-    params$s.file.data = args[2]
+# File name with CP output, e.g. objNuclei_1line_clean_tracks.csv
+# This file will be searched in subdirectories of s.dir.data folder
+params$s.file.data = args[2]
+
+# Suffix to add to output directory name for placing merged output
+# Default ".mer"
+if (is.na(args[3]))
+  params$s.dir.suf = ".mer" else
+  params$s.dir.suf = args[3]
+
 
 # Create directory for merged output in the current working directory
-params$s.dir.out = paste0(params$s.dir.data, '.mer')
+# Directory with merged output has the same name as the root output directory but with params$s.file.suf suffix
+params$s.dir.out = paste0(params$s.dir.data, params$s.dir.suf)
 ifelse(!dir.exists(file.path(params$s.dir.out)), 
        dir.create(file.path(params$s.dir.out)), 
        FALSE)
