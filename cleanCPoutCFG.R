@@ -3,7 +3,7 @@
 # Removes selected columns based on a config file provided as an argument
 #
 # Example call from the command-line
-# Rscript cleanCPoutCFG.R objNuclei.csv objNuclei_1line.csv lapconfig.csv
+# Rscript cleanCPoutCFG.R lapconfig.csv
 # 
 # The lapconfig.csv should contain two columns with a header.
 # The 1st column should contain parameter name.
@@ -14,29 +14,31 @@
 
 args <- commandArgs(TRUE)
 
-# input file
-s.f.in = args[1]
-
-# output file
-s.f.out = args[2]
+par = list()
 
 # Path to config csv file
-s.f.cfg = args[3]
+par$s.f.cfg = args[1]
 
-if(sum(is.na(c(s.f.in, s.f.out, s.f.cfg))) > 0) {
-  stop('Wrong number of parameters! Call: Rscript cleanCPoutCFG.R input_file output_file config_file')
+# Path to working directory
+par$s.wd = args[2]
+
+if(sum(is.na(c(par$s.f.cfg, par$s.wd))) > 0) {
+  stop('Wrong number of parameters! Call: Rscript cleanCPoutCFG.R config_file path_to_wd')
 }
 
 ## defs
 # name of the parameter with columns for removal
-s.clean.cols = "clean_cols"
+par$cfg.file_cpout = 'file_cpout'
+par$cfg.file_cpout_1line = "file_cpout_1line"
+par$cfg.clean_cols = "clean_cols"
+par$csvext = '.csv'
 
 require(tca)
 require(data.table)
 
 ## read config file
 # read the csv file; 2 columns only
-dt.cfg = fread(s.f.cfg,select = 1:2)
+dt.cfg = fread(par$s.f.cfg, select = 1:2)
 
 # convert to a list
 l.cfg = split(dt.cfg[[2]], dt.cfg[[1]])
@@ -48,19 +50,34 @@ l.cfg = tca::convertStringList2Types(l.cfg)
 # remove repeated columns; 
 # remove columns according to the list in s.cols.rm
 
+
+# check whether config file contains "file_cpout" paramater
+if(par$cfg.file_cpout %in% names(l.cfg)) {
+  par$file_cpout = l.cfg[[par$cfg.file_cpout]]
+} else {
+  stop(sprintf('Config file does not contain %s parameter, please provide!.', par$cfg.file_cpout))
+}
+
+# check whether config file contains "file_cpout_1line" paramater
+if(par$cfg.file_cpout_1line %in% names(l.cfg)) {
+  par$file_cpout_1line = l.cfg[[par$cfg.file_cpout_1line]]
+} else {
+  stop(sprintf('Config file does not contain %s parameter, please provide!.', par$cfg.file_cpout_1line))
+}
+
 # check whether config file contains "clean_cols" paramater
-if(!(s.clean.cols %in% names(l.cfg))) {
-  print(sprintf('Config file does not contain %s parameter; all columns kept.', s.clean.cols))
-  s.cols.rm = NULL
+if(!(par$cfg.clean_cols %in% names(l.cfg))) {
+  print(sprintf('Config file does not contain %s parameter; all columns kept.', par$cfg.clean_cols))
+  par$clean_cols = NULL
 } else {
   # split the string with (multiple) column names to remove into a list of strings
-  s.cols.rm = unlist(strsplit(l.cfg[[s.clean.cols]], ','))
-  print(sprintf("Removing columns: %s", s.cols.rm))
+  par$clean_cols = unlist(strsplit(l.cfg[[par$cfg.clean_cols]], ','))
+  print(sprintf("Removing columns: %s", par$clean_cols))
 }
 
 
 # read data csv with a 2-line header, remove columns in s.cols.rm
-dt = freadCSV2lineHeader(s.f.in, s.cols.rm)
+dt = freadCSV2lineHeader(file.path(par$s.wd, par$file_cpout), par$clean_cols)
 
 # save file; no row numbers, no quotes around strings
-write.csv(x = dt, file = s.f.out, row.names = F, quote = F)
+write.csv(x = dt, file = file.path(par$s.wd, par$file_cpout_1line), row.names = F, quote = F)
