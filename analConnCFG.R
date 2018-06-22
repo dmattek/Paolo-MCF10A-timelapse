@@ -13,13 +13,14 @@ params = list()
 # Path to config csv file
 params$s.f.cfg = args[1]
 #params$s.f.cfg = '~/Projects/Olivier/modelDatasets/timelapse/2018-03-28_MCF10Amutants_sparse_5x103_H2B-miRFP_ERK-Turq_FoxO-NeonGreen_10xAir_T5min_NoStim-0ngmlEGF_6h-starving_CO2/cp.out/lapconfig.csv'
+params$s.f.cfg = '~/Projects/Olivier/modelDatasets/timelapse/20180503_systIII_dose_response_sameFOV/cp.out.exp2.ring4/lapconfig.csv'
 
 # Path to CP output
 # This directory is the root for all following directories
 # E.g. myexp1/cp.out1/output/out_0001
 params$s.dir.data = args[2]
 #params$s.dir.data = '~/Projects/Olivier/modelDatasets/timelapse/2018-03-28_MCF10Amutants_sparse_5x103_H2B-miRFP_ERK-Turq_FoxO-NeonGreen_10xAir_T5min_NoStim-0ngmlEGF_6h-starving_CO2/cp.out/output/out_0001'
-
+params$s.dir.data = '~/Projects/Olivier/modelDatasets/timelapse/20180503_systIII_dose_response_sameFOV/cp.out.exp2.ring4/output/out_0008'
 
 if(sum(is.na(args[1:2])) > 0) {
   stop('Wrong number of parameters! Call: Rscript cleanCPoutCFG.R path_to_config_file path_to_cp_out')
@@ -206,9 +207,6 @@ if (params$s.well == 'none') {
   
 }
 
-
-print("merge 1")
-
 # merge connectivities with data
 # dt.con holds the output from MATLAB with object numbers that belong to individual tracks
 # Each of these object numbers is merged with data from CP output
@@ -244,8 +242,8 @@ v.longtrackid = dt.tracklen[N > params$tracklen, get(params$s.trackuni)]
 dt.concp.sub = dt.concp[get(params$s.trackuni) %in% v.longtrackid]
 
 if (b.well)
-  setkeyv(dt.concp.sub, c(params$s.well, params$s.site, params$s.track)) else
-setkeyv(dt.concp.sub, c(params$s.site, params$s.track))
+  setkeyv(dt.concp.sub, c(params$s.well, params$s.fov, params$s.track)) else
+setkeyv(dt.concp.sub, c(params$s.fov, params$s.track))
 
 
 
@@ -259,9 +257,9 @@ v.meascol = names(dt.concp.sub)[names(dt.concp.sub) %like% 'obj']
 
 
 if (b.well)
-write.csv(x = dt.concp.sub[, (c(params$s.well, params$s.site, params$s.time, params$s.track, params$s.trackuni, params$s.pm.condall, v.meascol)), with = FALSE], 
+write.csv(x = dt.concp.sub[, (c(params$s.well, params$s.fov, params$s.frame, params$s.track, params$s.trackuni, v.meascol)), with = FALSE], 
           file = file.path(params$s.dir.data, paste0(params$s.f.core, params$s.f.track.suff)), 
           row.names = F, quote = F) else
-write.csv(x = dt.concp.sub[, (c(params$s.site, params$s.time, params$s.track, params$s.trackuni, params$s.pm.condall, v.meascol)), with = FALSE],
+write.csv(x = dt.concp.sub[, (c(params$s.fov, params$s.frame, params$s.track, params$s.trackuni, v.meascol)), with = FALSE],
           file = file.path(params$s.dir.data, paste0(params$s.f.core, params$s.f.track.suff)),
           row.names = F, quote = F)

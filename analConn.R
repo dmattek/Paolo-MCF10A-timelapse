@@ -171,9 +171,9 @@ v.meascol = names(dt.concp.sub)[names(dt.concp.sub) %like% 'obj']
 
 
 if (b.well)
-write.csv(x = dt.concp.sub[, (c(params$s.well, params$s.site, params$s.time, params$s.track, params$s.trackuni, params$s.pm.condall, v.meascol)), with = FALSE], 
+write.csv(x = dt.concp.sub[, (c(params$s.well, params$s.site, params$s.time, params$s.track, params$s.trackuni, v.meascol)), with = FALSE], 
           file = file.path(params$s.dir.data, paste0(params$s.file.core, params$s.file.track.suff)), 
           row.names = F, quote = F) else
-write.csv(x = dt.concp.sub[, (c(params$s.site, params$s.time, params$s.track, params$s.trackuni, params$s.pm.condall, v.meascol)), with = FALSE],
+write.csv(x = dt.concp.sub[, (c(params$s.site, params$s.time, params$s.track, params$s.trackuni, v.meascol)), with = FALSE],
           file = file.path(params$s.dir.data, paste0(params$s.file.core, params$s.file.track.suff)),
           row.names = F, quote = F)
