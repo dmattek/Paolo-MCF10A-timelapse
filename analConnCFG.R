@@ -13,14 +13,14 @@ params = list()
 # Path to config csv file
 params$s.f.cfg = args[1]
 #params$s.f.cfg = '~/Projects/Olivier/modelDatasets/timelapse/2018-03-28_MCF10Amutants_sparse_5x103_H2B-miRFP_ERK-Turq_FoxO-NeonGreen_10xAir_T5min_NoStim-0ngmlEGF_6h-starving_CO2/cp.out/lapconfig.csv'
-params$s.f.cfg = '~/Projects/Olivier/modelDatasets/timelapse/20180503_systIII_dose_response_sameFOV/cp.out.exp2.ring4/lapconfig.csv'
+#params$s.f.cfg = '~/Projects/Olivier/modelDatasets/timelapse/20180503_systIII_dose_response_sameFOV/cp.out.exp2.ring4/lapconfig.csv'
 
 # Path to CP output
 # This directory is the root for all following directories
 # E.g. myexp1/cp.out1/output/out_0001
 params$s.dir.data = args[2]
 #params$s.dir.data = '~/Projects/Olivier/modelDatasets/timelapse/2018-03-28_MCF10Amutants_sparse_5x103_H2B-miRFP_ERK-Turq_FoxO-NeonGreen_10xAir_T5min_NoStim-0ngmlEGF_6h-starving_CO2/cp.out/output/out_0001'
-params$s.dir.data = '~/Projects/Olivier/modelDatasets/timelapse/20180503_systIII_dose_response_sameFOV/cp.out.exp2.ring4/output/out_0008'
+#params$s.dir.data = '~/Projects/Olivier/modelDatasets/timelapse/20180503_systIII_dose_response_sameFOV/cp.out.exp2.ring4/output/out_0008'
 
 if(sum(is.na(args[1:2])) > 0) {
   stop('Wrong number of parameters! Call: Rscript cleanCPoutCFG.R path_to_config_file path_to_cp_out')
