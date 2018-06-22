@@ -6,7 +6,6 @@
 # Rscript combineOutput2.R ~/myexp1/cp.out/output objNuc.csv .mer
 # Last parameter is optional, defaults to ".mer"
 
-require(data.table)
 
 args <- commandArgs(TRUE)
 
@@ -14,6 +13,7 @@ if(sum(is.na(args[1:2])) > 0) {
   stop('Insufficient input parameters. Call: Rscript combineOutput2.R CPoutput_dir CPoutput_file DirSuffix [optional; default .mer')
 }
 
+require(data.table)
 
 # params
 params = list()
@@ -38,6 +38,8 @@ if (is.na(args[3]))
 
 # Create directory for merged output in the current working directory
 # Directory with merged output has the same name as the root output directory but with params$s.file.suf suffix
+# First remove trailing / from s.dir.data
+params$s.dir.data = gsub('\\/$', '', params$s.dir.data)
 params$s.dir.out = paste0(params$s.dir.data, params$s.dir.suf)
 ifelse(!dir.exists(file.path(params$s.dir.out)), 
        dir.create(file.path(params$s.dir.out)), 
@@ -46,12 +48,17 @@ ifelse(!dir.exists(file.path(params$s.dir.out)),
 
 # store locations of all csv files in the output folder
 s.files = list.files(path = file.path(params$s.dir.data), 
-                     pattern = params$s.file.data, 
+                     pattern = paste0(params$s.file.data, "$"),
                      recursive = TRUE, 
                      full.names = TRUE)
+cat("Merging files:\n")
+cat(s.files)
+cat("\n")
 
 dt.all = do.call(rbind, lapply(s.files, fread))
                                
 # write merged dataset
+cat(sprintf("Saving output to: %s\n", file.path(params$s.dir.out, params$s.file.data)))
+
 write.csv(dt.all, file = file.path(params$s.dir.out, params$s.file.data), row.names = F) 
 
