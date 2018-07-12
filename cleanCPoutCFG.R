@@ -77,7 +77,7 @@ if(!(par$cfg.clean_cols %in% names(l.cfg))) {
 
 
 # read data csv with a 2-line header, remove columns in s.cols.rm
-dt = freadCSV2lineHeader(file.path(par$s.wd, par$file_cpout), par$clean_cols)
+dt = tca::freadCSV2lineHeader(file.path(par$s.wd, par$file_cpout), par$clean_cols)
 
 # save file; no row numbers, no quotes around strings
 write.csv(x = dt, file = file.path(par$s.wd, par$file_cpout_1line), row.names = F, quote = F)

@@ -3,6 +3,7 @@
 # that contains indices of objects from every frame that form a tracks
 
 require(data.table)
+require(tca)
 
 ## Parse command-line params
 args <- commandArgs(TRUE)
