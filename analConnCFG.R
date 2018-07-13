@@ -259,13 +259,13 @@ setkeyv(dt.concp.sub, c(params$s.fov, params$s.track))
 
 if (b.well)
 {
-  v.metacols = c(params$s.well, params$s.fov, params$s.frame, params$s.track, params$s.trackuni, v.meascol)
+  v.metacols = c(params$s.well, params$s.fov, params$s.frame, params$s.track, params$s.trackuni)
   v.allcols  = union(names(dt.concp.sub), v.metacols) 
   write.csv(x = dt.concp.sub[, (v.allcols), with = FALSE], 
             file = file.path(params$s.dir.data, paste0(params$s.f.core, params$s.f.track.suff)), 
             row.names = F, quote = F)  
 } else {
-  v.metacols = c(params$s.fov, params$s.frame, params$s.track, params$s.trackuni, v.meascol)
+  v.metacols = c(params$s.fov, params$s.frame, params$s.track, params$s.trackuni)
   v.allcols  = union(names(dt.concp.sub), v.metacols) 
   write.csv(x = dt.concp.sub[, (v.allcols), with = FALSE],
              file = file.path(params$s.dir.data, paste0(params$s.f.core, params$s.f.track.suff)),
