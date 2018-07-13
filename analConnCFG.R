@@ -15,6 +15,7 @@ params = list()
 params$s.f.cfg = args[1]
 #params$s.f.cfg = '~/Projects/Olivier/modelDatasets/timelapse/2018-03-28_MCF10Amutants_sparse_5x103_H2B-miRFP_ERK-Turq_FoxO-NeonGreen_10xAir_T5min_NoStim-0ngmlEGF_6h-starving_CO2/cp.out/lapconfig.csv'
 #params$s.f.cfg = '~/Projects/Olivier/modelDatasets/timelapse/20180503_systIII_dose_response_sameFOV/cp.out.exp2.ring4/lapconfig.csv'
+#params$s.f.cfg = '/mnt/imaging.data/Pascal/293B5/20180711_293/cp.out.2/lapconfig.csv'
 
 # Path to CP output
 # This directory is the root for all following directories
@@ -22,6 +23,7 @@ params$s.f.cfg = args[1]
 params$s.dir.data = args[2]
 #params$s.dir.data = '~/Projects/Olivier/modelDatasets/timelapse/2018-03-28_MCF10Amutants_sparse_5x103_H2B-miRFP_ERK-Turq_FoxO-NeonGreen_10xAir_T5min_NoStim-0ngmlEGF_6h-starving_CO2/cp.out/output/out_0001'
 #params$s.dir.data = '~/Projects/Olivier/modelDatasets/timelapse/20180503_systIII_dose_response_sameFOV/cp.out.exp2.ring4/output/out_0008'
+#params$s.dir.data = '/mnt/imaging.data/Pascal/293B5/20180711_293/cp.out.2/output/out_0001'
 
 if(sum(is.na(args[1:2])) > 0) {
   stop('Wrong number of parameters! Call: Rscript cleanCPoutCFG.R path_to_config_file path_to_cp_out')
@@ -251,16 +253,21 @@ setkeyv(dt.concp.sub, c(params$s.fov, params$s.track))
 # save a reduced dataset with:
 # Image_Metadata_Well Image_Metadata_Site Image_Metadata_T
 # track_id - track ID from u-track (it's unique per analysis; if analysis with u-track was performed on the entire dataset, track_id is unique)
-# condAll - experimental conditions from experimentDescription.xlsx
 # all measurements as in the full data set
 # ONLY CELLS with tracks longer than the threshold params$tracklen
-v.meascol = names(dt.concp.sub)[names(dt.concp.sub) %like% 'obj']
 
 
 if (b.well)
-write.csv(x = dt.concp.sub[, (c(params$s.well, params$s.fov, params$s.frame, params$s.track, params$s.trackuni, v.meascol)), with = FALSE], 
-          file = file.path(params$s.dir.data, paste0(params$s.f.core, params$s.f.track.suff)), 
-          row.names = F, quote = F) else
-write.csv(x = dt.concp.sub[, (c(params$s.fov, params$s.frame, params$s.track, params$s.trackuni, v.meascol)), with = FALSE],
-          file = file.path(params$s.dir.data, paste0(params$s.f.core, params$s.f.track.suff)),
-          row.names = F, quote = F)
+{
+  v.metacols = c(params$s.well, params$s.fov, params$s.frame, params$s.track, params$s.trackuni, v.meascol)
+  v.allcols  = union(names(dt.concp.sub), v.metacols) 
+  write.csv(x = dt.concp.sub[, (v.allcols), with = FALSE], 
+            file = file.path(params$s.dir.data, paste0(params$s.f.core, params$s.f.track.suff)), 
+            row.names = F, quote = F)  
+} else {
+  v.metacols = c(params$s.fov, params$s.frame, params$s.track, params$s.trackuni, v.meascol)
+  v.allcols  = union(names(dt.concp.sub), v.metacols) 
+  write.csv(x = dt.concp.sub[, (v.allcols), with = FALSE],
+             file = file.path(params$s.dir.data, paste0(params$s.f.core, params$s.f.track.suff)),
+             row.names = F, quote = F)
+}
