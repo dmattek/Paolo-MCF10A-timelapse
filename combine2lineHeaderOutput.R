@@ -55,6 +55,14 @@ ifelse(!dir.exists(file.path(params$s.dir.out)),
        dir.create(file.path(params$s.dir.out)), 
        FALSE)
 
+# Create vector with columns to remove based on the input parameter
+params$s.col.rem = unlist(strsplit(opt$remcols, ','))
+
+# 
+cat(sprintf("Processing data in: %s\n", params$s.dir.data))
+cat(sprintf("Saving output to  : %s\n\n", file.path(params$s.dir.out, params$s.file.data)))
+cat(sprintf("Removing columns  :\n %s\n\n", opt$s.col.rem))
+
 
 # store locations of all csv files in the output folder
 s.files = list.files(path = file.path(params$s.dir.data), 
@@ -69,10 +77,8 @@ LOCfread = function(inFile) {
   
 }
 
-dt.all = do.call(rbind, lapply(s.files, freadCSV2lineHeader, in.col.rem = opt$remcols))
+dt.all = do.call(rbind, lapply(s.files, function(x) freadCSV2lineHeader(x, in.col.rem = params$s.col.rem)))
 
 # write merged dataset
-cat(sprintf("Saving output to: %s\n", file.path(params$s.dir.out, params$s.file.data)))
-
 write.csv(dt.all, file = file.path(params$s.dir.out, params$s.file.data), row.names = F) 
 
