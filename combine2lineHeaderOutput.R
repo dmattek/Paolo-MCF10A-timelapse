@@ -6,15 +6,27 @@
 # Rscript combine2lineHeaderOutput.R ~/myexp1/cp.out/output objNuc.csv .mer
 # Last parameter is optional, defaults to ".mer"
 
-
-args <- commandArgs(TRUE)
-
-if(sum(is.na(args[1:2])) > 0) {
-  stop('Insufficient input parameters. Call: Rscript combine2lineHeaderOutput.R CPoutput_dir CPoutput_file DirSuffix [optional; default .mer')
-}
-
 require(data.table)
 require(tca)
+require(optparse)
+
+# parser of command-line arguments from:
+# https://www.r-bloggers.com/passing-arguments-to-an-r-script-from-command-lines/
+
+option_list = list(
+  make_option(c("-o", "--dirout"), type="character", default="output", 
+              help="directory with entire output [default= %default]", metavar="character"),
+  make_option(c("-f", "--fileout"), type="character", default="objNuclei.csv", 
+              help="csv with 2-line header output [default= %default]", metavar="character"),
+  make_option(c("-s", "--suffout"), type="character", default=".mer", 
+              help="suffix to add to the output directory, to make directory with merged output [default= %default]", metavar="character"),
+  make_option(c("-r", "--remcols"), type="character", default="NULL", 
+              help="quoted, comma-separated list with column names to remove [default= %default]", metavar="character")
+); 
+
+opt_parser = OptionParser(option_list=option_list);
+opt = parse_args(opt_parser);
+
 
 # params
 params = list()
@@ -24,18 +36,15 @@ params = list()
 # Path to CP output
 # This directory is the root for a directory that contains sub-directories
 # E.g. myexp1/cp.out1/output
-params$s.dir.data = args[1]
+params$s.dir.data = opt$dirout
 
 # File name with CP output, e.g. objNuclei_1line_clean_tracks.csv
 # This file will be searched in subdirectories of s.dir.data folder
-params$s.file.data = args[2]
+params$s.file.data = opt$fileout
 
 # Suffix to add to output directory name for placing merged output
 # Default ".mer"
-if (is.na(args[3]))
-  params$s.dir.suf = ".mer" else
-    params$s.dir.suf = args[3]
-
+params$s.dir.suf = opt$suffout
 
 # Create directory for merged output in the current working directory
 # Directory with merged output has the same name as the root output directory but with params$s.file.suf suffix
@@ -60,7 +69,7 @@ LOCfread = function(inFile) {
   
 }
 
-dt.all = do.call(rbind, lapply(s.files, freadCSV2lineHeader))
+dt.all = do.call(rbind, lapply(s.files, freadCSV2lineHeader, in.col.rem = opt$remcols))
 
 # write merged dataset
 cat(sprintf("Saving output to: %s\n", file.path(params$s.dir.out, params$s.file.data)))
