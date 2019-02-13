@@ -6,14 +6,27 @@
 # Rscript combine1lineHeaderOutput.R ~/myexp1/cp.out/output objNuc.csv .mer
 # Last parameter is optional, defaults to ".mer"
 
-
-args <- commandArgs(TRUE)
-
-if(sum(is.na(args[1:2])) > 0) {
-  stop('Insufficient input parameters. Call: Rscript combine1lineHeaderOutput.R CPoutput_dir CPoutput_file DirSuffix [optional; default .mer')
-}
-
 require(data.table)
+require(tca)
+require(optparse)
+
+# parser of command-line arguments from:
+# https://www.r-bloggers.com/passing-arguments-to-an-r-script-from-command-lines/
+
+option_list = list(
+  make_option(c("-o", "--dirout"), type="character", default="output", 
+              help="directory with entire output [default= %default]", metavar="character"),
+  make_option(c("-f", "--fileout"), type="character", default="objNuclei.csv", 
+              help="csv with 2-line header output [default= %default]", metavar="character"),
+  make_option(c("-s", "--suffout"), type="character", default=".mer", 
+              help="suffix to add to the output directory, to make directory with merged output [default= %default]", metavar="character"),
+  make_option(c("-r", "--remcols"), type="character", default="NULL", 
+              help="quoted, comma-separated list with column names to remove [default= %default]", metavar="character")
+); 
+
+opt_parser = OptionParser(option_list=option_list);
+opt = parse_args(opt_parser);
+
 
 # params
 params = list()
@@ -23,17 +36,15 @@ params = list()
 # Path to CP output
 # This directory is the root for a directory that contains sub-directories
 # E.g. myexp1/cp.out1/output
-params$s.dir.data = args[1]
+params$s.dir.data = opt$dirout
 
 # File name with CP output, e.g. objNuclei_1line_clean_tracks.csv
 # This file will be searched in subdirectories of s.dir.data folder
-params$s.file.data = args[2]
+params$s.file.data = opt$fileout
 
 # Suffix to add to output directory name for placing merged output
 # Default ".mer"
-if (is.na(args[3]))
-  params$s.dir.suf = ".mer" else
-    params$s.dir.suf = args[3]
+params$s.dir.suf = opt$suffout
 
 
 # Create directory for merged output in the current working directory
@@ -44,6 +55,14 @@ params$s.dir.out = paste0(params$s.dir.data, params$s.dir.suf)
 ifelse(!dir.exists(file.path(params$s.dir.out)), 
        dir.create(file.path(params$s.dir.out)), 
        FALSE)
+
+# Create vector with columns to remove based on the input parameter
+params$s.col.rem = unlist(strsplit(opt$remcols, ','))
+
+# 
+cat(sprintf("Processing data in: %s\n", params$s.dir.data))
+cat(sprintf("Saving output to  : %s\n\n", file.path(params$s.dir.out, params$s.file.data)))
+cat(sprintf("Removing columns  :\n %s\n\n", opt$s.col.rem))
 
 
 # store locations of all csv files in the output folder
@@ -57,8 +76,21 @@ cat("\n")
 
 dt.all = do.call(rbind, lapply(s.files, fread))
 
-# write merged dataset
-cat(sprintf("Saving output to: %s\n", file.path(params$s.dir.out, params$s.file.data)))
+# Remove columns according to input params
+if (length(params$s.col.rem) > 0 )
+  dt.all[, c(params$s.col.rem) := NULL]
 
+# check whether the list of columns to remove provided as the f-n parameter
+# contains column names in the data table
+if (!is.null(params$s.col.rem)) {
+  loc.col.rem = intersect(names(dt.all), params$s.col.rem)
+  
+  # remove columns if the list isn't empty
+  if (length(params$s.col.rem) > 0)
+    dt.all[, (params$s.col.rem) := NULL]
+}
+
+
+# write merged dataset
 write.csv(dt.all, file = file.path(params$s.dir.out, params$s.file.data), row.names = F) 
 
