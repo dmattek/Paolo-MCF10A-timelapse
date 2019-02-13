@@ -83,8 +83,8 @@ if (!is.null(params$s.col.rem)) {
   loc.col.rem = intersect(names(dt.all), params$s.col.rem)
   
   # remove columns if the list isn't empty
-  if (length(params$s.col.rem) > 0)
-    dt.all[, (params$s.col.rem) := NULL]
+  if (length(loc.col.rem) > 0)
+    dt.all[, (loc.col.rem) := NULL]
 }
 
 
