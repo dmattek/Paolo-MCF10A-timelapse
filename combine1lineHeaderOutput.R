@@ -77,9 +77,6 @@ cat("\n")
 dt.all = do.call(rbind, lapply(s.files, fread))
 
 # Remove columns according to input params
-if (length(params$s.col.rem) > 0 )
-  dt.all[, c(params$s.col.rem) := NULL]
-
 # check whether the list of columns to remove provided as the f-n parameter
 # contains column names in the data table
 if (!is.null(params$s.col.rem)) {
