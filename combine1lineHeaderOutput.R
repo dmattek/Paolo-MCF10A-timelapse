@@ -8,6 +8,7 @@
 
 require(data.table)
 require(optparse)
+require(R.utils)
 
 # parser of command-line arguments from:
 # https://www.r-bloggers.com/passing-arguments-to-an-r-script-from-command-lines/
@@ -20,7 +21,9 @@ option_list = list(
   make_option(c("-s", "--suffout"), type="character", default=".mer", 
               help="suffix to add to the output directory, to make directory with merged output [default= %default]", metavar="character"),
   make_option(c("-r", "--remcols"), type="character", default="", 
-              help="quoted, no spaces, comma-separated list with column names to remove [default= %default; e.g. \"Image_Metadata_C,Image_Metadata_Z\"]", metavar="character")
+              help="quoted, no spaces, comma-separated list with column names to remove [default= %default; e.g. \"Image_Metadata_C,Image_Metadata_Z\"]", metavar="character"),
+  make_option(c("-z", "--gzip"), action="store_true", default="FALSE", 
+              help="gzip the resulting csv [default= %default]")
 ); 
 
 opt_parser = OptionParser(option_list=option_list);
@@ -74,7 +77,8 @@ s.files = list.files(path = file.path(params$s.dir.data),
                      pattern = paste0(params$s.file.data, "$"),
                      recursive = TRUE, 
                      full.names = TRUE)
-cat("Merging files:\n")
+
+cat(sprintf("Merging %d files:\n", length(s.files)))
 cat(s.files)
 cat("\n")
 
@@ -93,5 +97,9 @@ if (!is.null(params$s.col.rem)) {
 
 
 # write merged dataset
-write.csv(dt.all, file = file.path(params$s.dir.out, params$s.file.data), row.names = F) 
+fwrite(dt.all, file = file.path(params$s.dir.out, params$s.file.data), row.names = F) 
 
+if (opt$gzip) {
+	cat("\nMerged file will be gzipped\n")
+	gzip(file.path(params$s.dir.out, params$s.file.data))
+}

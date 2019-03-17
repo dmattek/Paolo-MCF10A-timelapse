@@ -8,7 +8,7 @@
 
 require(data.table)
 require(optparse)
-
+require(R.utils)
 
 #' Read a CSV file with a 2-line header
 #'
@@ -67,8 +67,10 @@ option_list = list(
   make_option(c("-s", "--suffout"), type="character", default=".mer", 
               help="suffix to add to the output directory, to make directory with merged output [default= %default]", metavar="character"),
   make_option(c("-r", "--remcols"), type="character", default="", 
-              help="quoted, no spaces, comma-separated list with column names to remove [default= %default; e.g. \"Image_Metadata_C,Image_Metadata_Z\"]", metavar="character")
-); 
+              help="quoted, no spaces, comma-separated list with column names to remove [default= %default; e.g. \"Image_Metadata_C,Image_Metadata_Z\"]", metavar="character"),
+  make_option(c("-z", "--gzip"), action="store_true", default="FALSE",
+              help="gzip the resulting csv [default= %default]")
+);
 
 opt_parser = OptionParser(option_list=option_list);
 opt = parse_args(opt_parser);
@@ -126,5 +128,8 @@ cat("\n")
 dt.all = do.call(rbind, lapply(s.files, function(x) LOCfreadCSV2lineHeader(x, in.col.rem = params$s.col.rem)))
 
 # write merged dataset
-write.csv(dt.all, file = file.path(params$s.dir.out, params$s.file.data), row.names = F) 
-
+fwrite(dt.all, file = file.path(params$s.dir.out, params$s.file.data), row.names = F) 
+if (opt$gzip) {
+        cat("\nMerged file will be gzipped\n")
+        gzip(file.path(params$s.dir.out, params$s.file.data))
+}
